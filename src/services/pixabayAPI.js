@@ -16,4 +16,4 @@ async function getData(query, page) {
   return data;
 }
 
-export default getData;
+export default { getData };
