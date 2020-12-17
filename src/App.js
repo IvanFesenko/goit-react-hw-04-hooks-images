@@ -20,20 +20,32 @@ function App() {
   const [newPageCords, setNewPageCords] = useState(0);
 
   useEffect(() => {
+    if (!query) {
+      return;
+    }
+
+    const scrollToNextPage = () => {
+      window.scrollTo({
+        top: newPageCords,
+        behavior: 'smooth',
+      });
+    };
+
     const getData = async () => {
       try {
         const data = await API.getData(query, pageNumber);
         setImages(prevImages => [...prevImages, ...data.hits]);
-        setLoading(false);
+        scrollToNextPage();
         setNewPageCords(document.documentElement.scrollHeight - 170);
         setTotalPages(Math.ceil(data.totalHits / 12));
+        setLoading(false);
       } catch (error) {
         setLoading(false);
       }
     };
 
-    if (query) getData();
-  }, [query, pageNumber]);
+    getData();
+  }, [pageNumber, query]);
 
   const onSearch = newQuery => {
     setPage(1);
@@ -44,15 +56,7 @@ function App() {
     setNewPageCords(0);
   };
 
-  const scrollToNextPage = () => {
-    window.scrollTo({
-      top: newPageCords,
-      behavior: 'smooth',
-    });
-  };
-
   const loadMore = () => {
-    setTimeout(scrollToNextPage, 800);
     setPage(prevPage => prevPage + 1);
   };
 
