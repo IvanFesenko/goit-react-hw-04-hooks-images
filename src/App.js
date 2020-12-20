@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import s from './App.module.css';
 
@@ -17,7 +17,7 @@ function App() {
   const [totalPages, setTotalPages] = useState(0);
   const [modalSrc, setModalSrc] = useState('');
   const [isLoading, setLoading] = useState(false);
-  const [newPageCords, setNewPageCords] = useState(0);
+  const newPageCords = useRef(0);
 
   useEffect(() => {
     if (!query) {
@@ -26,7 +26,7 @@ function App() {
 
     const scrollToNextPage = () => {
       window.scrollTo({
-        top: newPageCords,
+        top: newPageCords.current,
         behavior: 'smooth',
       });
     };
@@ -36,7 +36,7 @@ function App() {
         const data = await API.getData(query, pageNumber);
         setImages(prevImages => [...prevImages, ...data.hits]);
         scrollToNextPage();
-        setNewPageCords(document.documentElement.scrollHeight - 170);
+        newPageCords.current = document.documentElement.scrollHeight - 170;
         setTotalPages(Math.ceil(data.totalHits / 12));
         setLoading(false);
       } catch (error) {
@@ -53,7 +53,7 @@ function App() {
     setQuery(newQuery);
     setLoading(true);
     setImages([]);
-    setNewPageCords(0);
+    newPageCords.current = 0;
   };
 
   const loadMore = () => {
